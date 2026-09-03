@@ -23,8 +23,12 @@ export function App() {
   const [deleteTargetRepoId, setDeleteTargetRepoId] = useState<string | null>(null);
 
   // Jump to code state
-  const [selectedExplorerFile, setSelectedExplorerFile] = useState<string>("");
-  const [selectedLineRange, setSelectedLineRange] = useState<{ start: number; end: number } | undefined>(undefined);
+  const [jumpTarget, setJumpTarget] = useState<{
+    filePath: string;
+    startLine: number;
+    endLine: number;
+    timestamp: number;
+  } | null>(null);
 
   // Fetch repositories list from backend
   const fetchReposList = useCallback(async () => {
@@ -70,8 +74,7 @@ export function App() {
   }, [activeRepoId]);
 
   const handleNavigateToCode = (filePath: string, startLine: number, endLine: number) => {
-    setSelectedExplorerFile(filePath);
-    setSelectedLineRange({ start: startLine, end: endLine });
+    setJumpTarget({ filePath, startLine, endLine, timestamp: Date.now() });
     setCurrentTab("explorer");
   };
 
@@ -103,8 +106,7 @@ export function App() {
           key={activeRepoId}
           repoId={activeRepoId}
           structureStr={activeRepoStructure}
-          initialSelectedFile={selectedExplorerFile}
-          initialLineRange={selectedLineRange}
+          jumpTarget={jumpTarget}
         />
       </div>
 

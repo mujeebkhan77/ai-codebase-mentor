@@ -3,24 +3,31 @@ import { Folder, FileCode2, Loader2, AlertCircle } from "lucide-react";
 import { CodeViewer } from "../code/CodeViewer";
 import { getFileContent } from "../../lib/api";
 
+interface JumpTarget {
+  filePath: string;
+  startLine: number;
+  endLine: number;
+  timestamp: number;
+}
+
 interface CodeExplorerProps {
   repoId: string;
   structureStr: string;
-  initialSelectedFile?: string;
-  initialLineRange?: { start: number; end: number };
+  jumpTarget?: JumpTarget | null;
 }
 
 export function CodeExplorer({
   repoId,
   structureStr,
-  initialSelectedFile,
-  initialLineRange
+  jumpTarget
 }: CodeExplorerProps) {
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [fileContent, setFileContent] = useState<string>("");
   const [loadingFile, setLoadingFile] = useState<boolean>(false);
   const [fileError, setFileError] = useState<string | null>(null);
-  const [highlightedRange, setHighlightedRange] = useState<{ start: number; end: number } | undefined>(initialLineRange);
+  const [highlightedRange, setHighlightedRange] = useState<{ start: number; end: number } | undefined>(
+    jumpTarget ? { start: jumpTarget.startLine, end: jumpTarget.endLine } : undefined
+  );
 
   // Parse structure string lines into file list
   const filePaths: string[] = React.useMemo(() => {
@@ -39,23 +46,18 @@ export function CodeExplorer({
     return result;
   }, [structureStr]);
 
-  // Set initial selected file
+  // Update selected file & line range whenever jumpTarget changes or when tree loads initially
   useEffect(() => {
-    if (initialSelectedFile) {
-      const relative = initialSelectedFile.includes(`repositories/${repoId}/`)
-        ? initialSelectedFile.split(`repositories/${repoId}/`)[1]
-        : initialSelectedFile;
-      setSelectedFile(relative || initialSelectedFile);
+    if (jumpTarget && jumpTarget.filePath) {
+      const relative = jumpTarget.filePath.includes(`repositories/${repoId}/`)
+        ? jumpTarget.filePath.split(`repositories/${repoId}/`)[1]
+        : jumpTarget.filePath;
+      setSelectedFile(relative || jumpTarget.filePath);
+      setHighlightedRange({ start: jumpTarget.startLine, end: jumpTarget.endLine });
     } else if (filePaths.length > 0 && !selectedFile) {
       setSelectedFile(filePaths[0]);
     }
-  }, [initialSelectedFile, filePaths, repoId]);
-
-  useEffect(() => {
-    if (initialLineRange) {
-      setHighlightedRange(initialLineRange);
-    }
-  }, [initialLineRange]);
+  }, [jumpTarget, filePaths, repoId]);
 
   // Fetch real file content whenever selectedFile or repoId changes
   useEffect(() => {
