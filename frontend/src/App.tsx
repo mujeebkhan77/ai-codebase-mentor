@@ -94,34 +94,35 @@ export function App() {
       onOpenAddModal={() => setIsAddModalOpen(true)}
       onOpenDeleteModal={(rId) => setDeleteTargetRepoId(rId)}
     >
-      {currentTab === "overview" && (
-        <OverviewDashboard repoInfo={activeRepoInfo} onNavigate={setCurrentTab} />
-      )}
+      <div className={currentTab === "overview" ? "block" : "hidden"}>
+        <OverviewDashboard key={activeRepoId} repoInfo={activeRepoInfo} onNavigate={setCurrentTab} />
+      </div>
 
-      {currentTab === "explorer" && (
+      <div className={currentTab === "explorer" ? "block h-full" : "hidden"}>
         <CodeExplorer
+          key={activeRepoId}
           repoId={activeRepoId}
           structureStr={activeRepoStructure}
           initialSelectedFile={selectedExplorerFile}
           initialLineRange={selectedLineRange}
         />
-      )}
+      </div>
 
-      {currentTab === "ask" && (
-        <AskMentor repoId={activeRepoId} onNavigateToCode={handleNavigateToCode} />
-      )}
+      <div className={currentTab === "ask" ? "block" : "hidden"}>
+        <AskMentor key={activeRepoId} repoId={activeRepoId} onNavigateToCode={handleNavigateToCode} />
+      </div>
 
-      {currentTab === "search" && (
-        <SearchExperience repoId={activeRepoId} onNavigateToCode={handleNavigateToCode} />
-      )}
+      <div className={currentTab === "search" ? "block" : "hidden"}>
+        <SearchExperience key={activeRepoId} repoId={activeRepoId} onNavigateToCode={handleNavigateToCode} />
+      </div>
 
-      {currentTab === "symbols" && (
-        <SymbolExplorer repoId={activeRepoId} onNavigateToCode={handleNavigateToCode} />
-      )}
+      <div className={currentTab === "symbols" ? "block" : "hidden"}>
+        <SymbolExplorer key={activeRepoId} repoId={activeRepoId} onNavigateToCode={handleNavigateToCode} />
+      </div>
 
-      {currentTab === "relationships" && (
-        <RelationshipGraph repoId={activeRepoId} onNavigateToCode={handleNavigateToCode} />
-      )}
+      <div className={currentTab === "relationships" ? "block" : "hidden"}>
+        <RelationshipGraph key={activeRepoId} repoId={activeRepoId} onNavigateToCode={handleNavigateToCode} />
+      </div>
 
       {/* Modals */}
       <AddRepoModal
